@@ -1,43 +1,70 @@
-from pyray import *
-from raylib import * 
+import pyray as pr
+
 from random import randint, choice
 
-init_window(1920, 1080, "Camera")
-
+pr.init_window(800, 600, "Camera")
+pr.set_target_fps(60)
 # player
-pos = Vector2()
+pos = pr.Vector2()
 radius = 50
-direction = Vector2()
+direction = pr.Vector2()
 speed = 400
 
-# circles
+# circles, es una lista por comprension de circulos que empaqueta circulos de radio aleatorios dentro de la instancia de la ventana en ejecucion
 circles = [
     (
-        Vector2(randint(-2000,2000),randint(-1000,1000)), # pos
+        pr.Vector2(randint(-2000,2000),randint(-1000,1000)), # pos
         randint(50,200), # radius
-        choice([RED, GREEN, BLUE, YELLOW, ORANGE]) # color
+        choice([pr.RED, pr.GREEN, pr.BLUE, pr.YELLOW, pr.ORANGE]) # color
+        # del modulo random choice hace algo parecido solo que le damos una lista de 4 elementos y eligue entre esos 4
     ) 
     for i in range(100)
 ]
 
-while not window_should_close():
-    
+#definamos el sistema de camara que se compone de dos partes
+# PARTE 1:
+# definimos antes del bucle la camara de juego
+camera = pr.Camera2D()
+camera.zoom = 1
+# ahora defino el objetivo de la camara para que siga al jugador
+camera.target = pos
+# para que tenga sentido el movimiento debo de añadirle el desplazamiento es decir un OFFSET
+camera.offset = pr.Vector2(400,300)
+# ahora añado una rotacion para que se mueva con respecto al jugador
+camera.rotation = 0
+while not pr.window_should_close():
     # input
-    direction.x = int(is_key_down(KEY_RIGHT)) - int(is_key_down(KEY_LEFT))
-    direction.y = int(is_key_down(KEY_DOWN)) - int(is_key_down(KEY_UP))
-    direction = vector2_normalize(direction)
+    direction.x = int(pr.is_key_down(pr.KEY_RIGHT)) - int(pr.is_key_down(pr.KEY_LEFT))
+    direction.y = int(pr.is_key_down(pr.KEY_DOWN)) - int(pr.is_key_down(pr.KEY_UP))
+    direction = pr.vector2_normalize(direction)
 
     # movement
-    dt = get_frame_time()
+    dt = pr.get_frame_time()
     pos.x += direction.x * speed * dt
     pos.y += direction.y * speed * dt
-
+    # la camara que sigue al jugador
+    camera.target = pos
+    # actualizo el zoom de la camara
+    # detecto el movimiento de la rueda del raton
+    #digamos que el mejor metodo seria este de momento
+    rueda = pr.get_mouse_wheel_move()
+    if rueda != 0:
+        # mientras la rueda no se mueva es 0, cuando se mueve se mueve en justamente flotantes aunque no pareciera
+        zoom_speed = 0.1
+        camera.zoom += rueda * zoom_speed
+        camera.zoom = max(0.1,camera.zoom)
+    #camera update, es decir actualiza el valor de la camara
+    rotacion_de_camara = int(pr.is_key_down(pr.KEY_D)) - int(pr.is_key_down(pr.KEY_A))
+    camera.rotation += dt * rotacion_de_camara * 50
     # drawing
-    begin_drawing()
-    clear_background(WHITE)
+    pr.begin_drawing()
+    # de la parte 1 llamamos a la camara
+    pr.begin_mode_2d(camera)
+    pr.clear_background(pr.WHITE)
     for circle in circles:
-        draw_circle_v(*circle)
-    draw_circle_v(pos, radius, BLACK)
-    end_drawing()
+        pr.draw_circle_v(*circle) #hacemos lo mismo solo que desempaqueto la lista de tuplas generada mas arriba
+    pr.draw_circle_v(pos, radius, pr.BLACK)
+    pr.end_mode_2d() # hay que finalizar el modo antes de terminar el dibujado
+    pr.end_drawing()
 
-close_window()
+pr.close_window()

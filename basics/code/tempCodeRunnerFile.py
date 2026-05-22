@@ -1,2 +1,2 @@
 
-    
+    while not rl.WindowShouldClose():
