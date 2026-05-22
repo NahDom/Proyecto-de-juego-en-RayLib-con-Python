@@ -37,6 +37,6 @@ while not pr.window_should_close():
     pr.draw_text('Primer linea de texto en RayLib con Python',0,200, 30, pr.WHITE)
     pr.draw_text_ex(font,'TEXTO DE PRUEBA', pr.Vector2(0,600), 50, 2, pr.YELLOW)
     
-    pr.end_drawing()
+    pr.end_drawing() 
     # por como funciona el linker tengo que llamar a pr. a cada maldita funcion, por esto soy de c/c++
 pr.close_window()

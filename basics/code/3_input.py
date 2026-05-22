@@ -2,7 +2,9 @@ import pyray as pr
 
 
 pr.init_window(1200, 600, "Input")
-pr.set_target_fps(120) ## OBLIGATORIO PORQUE SIEMPRE FALLA EN TASAS DE REFRESCO DEMASIADO ALTAS
+# determino una tecla para salir rapido
+pr.set_exit_key(pr.KEY_ESCAPE)
+pr.set_target_fps(60) ## OBLIGATORIO PORQUE SIEMPRE FALLA EN TASAS DE REFRESCO DEMASIADO ALTAS
 ship_texture = pr.load_texture('basics/assets/spaceship.png')
 ship_pos = pr.Vector2(0,0)
 ship_direction = pr.Vector2(0,0)
@@ -18,9 +20,9 @@ while not pr.window_should_close():
     #ship input
     # una mejor solucion no llamada elegante es convertir al flotante que produce el movimiento en un entero por medio de reconvertir el valor por medio de int() que tomara el valor flotante haciendo
     # que este se trunque a su entero mas cercano de modo tal que no se pelee al momento de usar los vectores en el espacio
-    ship_direction.x = int(pr.is_key_pressed(pr.KEY_RIGHT)) - int(pr.is_key_pressed(pr.KEY_LEFT))
-    
-    
+    ship_direction.x = int(pr.is_key_down(pr.KEY_RIGHT)) - int(pr.is_key_down(pr.KEY_LEFT))
+    ship_direction.y = int(pr.is_key_down(pr.KEY_DOWN)) - int(pr.is_key_down(pr.KEY_UP))
+    ship_direction = pr.vector2_normalize(ship_direction)
     #actualizo el fotograma siguiente
     dt = pr.get_frame_time()
     # para hacer que la nave se pueda mover debo de sumar el valor de la direccion a la posicion 
